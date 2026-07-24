@@ -6,7 +6,7 @@ public class SpawnManager : MonoBehaviour
 {
     [SerializeField] private List<GameObject> targets;
 
-    private const float spawnRate = 1.0f;
+    public float spawnRate = 1.0f;
 
     private Coroutine spawnCoroutine;
 
@@ -20,8 +20,11 @@ public class SpawnManager : MonoBehaviour
         Target.OnGameOver -= StopSpawning;
     }
 
-    void Start()
+    public void StartSpawning()
     {
+        if (spawnCoroutine != null)
+            return;
+
         spawnCoroutine = StartCoroutine(SpawnTarget());
     }
 
@@ -30,6 +33,12 @@ public class SpawnManager : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(spawnRate);
+
+            if (targets.Count == 0)
+            {
+                Debug.LogError("No target prefabs assigned!");
+                yield break;
+            }
 
             int randomIndex = Random.Range(0, targets.Count);
 
