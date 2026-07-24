@@ -1,15 +1,22 @@
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Target : MonoBehaviour
 {
-    private const float minSpeed = 12;
-    private const float maxSpeed = 16;
+    [SerializeField] private int points;
+    [SerializeField] ParticleSystem explosionParticle;
+
+    private const float minSpeed = 13;
+    private const float maxSpeed = 16.5f;
     private const float maxTorque = 10;
     private const float xRange = 4;
     private const float ySpawnPos = -5;
 
     private Rigidbody targetRb;
+
+    public static event Action<int> OnTargetHit;
 
     void Awake()
     {
@@ -27,7 +34,7 @@ public class Target : MonoBehaviour
 
     Vector3 RandomForce()
     {
-        return Vector3.up* Random.Range(minSpeed, maxSpeed);
+        return Vector3.up * Random.Range(minSpeed, maxSpeed);
     }
 
     float RandomTorque()
@@ -42,7 +49,10 @@ public class Target : MonoBehaviour
 
     public void Hit()
     {
-        Debug.Log("Hit " + name);
+        OnTargetHit?.Invoke(points);
+
+        Instantiate(explosionParticle, transform.position, explosionParticle.transform.rotation);
+
         Destroy(gameObject);
     }
 
