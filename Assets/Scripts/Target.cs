@@ -6,6 +6,7 @@ using Random = UnityEngine.Random;
 public class Target : MonoBehaviour
 {
     [SerializeField] private int points;
+    [SerializeField] private bool isBomb;
     [SerializeField] ParticleSystem explosionParticle;
 
     private const float minSpeed = 13;
@@ -17,6 +18,7 @@ public class Target : MonoBehaviour
     private Rigidbody targetRb;
 
     public static event Action<int> OnTargetHit;
+    public static event Action OnGameOver;
 
     void Awake()
     {
@@ -49,7 +51,10 @@ public class Target : MonoBehaviour
 
     public void Hit()
     {
-        OnTargetHit?.Invoke(points);
+        if (!isBomb)
+            OnTargetHit?.Invoke(points);
+        else
+            OnGameOver?.Invoke();
 
         Instantiate(explosionParticle, transform.position, explosionParticle.transform.rotation);
 

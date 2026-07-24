@@ -1,10 +1,12 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private UIManager uiManager;
 
     private int score;
+    private bool isGameOver;
 
     void Awake()
     {
@@ -15,16 +17,32 @@ public class GameManager : MonoBehaviour
     void OnEnable()
     {
         Target.OnTargetHit += AddScore;
+        Target.OnGameOver += GameOver;
     }
 
     void OnDisable()
     {
         Target.OnTargetHit -= AddScore;
+        Target.OnGameOver -= GameOver;
     }
 
     private void AddScore(int amount)
     {
-        score += amount;
-        uiManager.UpdateScore(score);
+        if (!isGameOver) {
+            score += amount;
+            uiManager.UpdateScore(score);
+        }
+    }
+
+    private void GameOver()
+    {
+        isGameOver = true;
+
+        uiManager.ShowGameOver();
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

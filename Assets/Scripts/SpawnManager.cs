@@ -8,9 +8,21 @@ public class SpawnManager : MonoBehaviour
 
     private const float spawnRate = 1.0f;
 
+    private Coroutine spawnCoroutine;
+
+    void OnEnable()
+    {
+        Target.OnGameOver += StopSpawning;
+    }
+
+    void OnDisable()
+    {
+        Target.OnGameOver -= StopSpawning;
+    }
+
     void Start()
     {
-        StartCoroutine(SpawnTarget());
+        spawnCoroutine = StartCoroutine(SpawnTarget());
     }
 
     IEnumerator SpawnTarget()
@@ -22,6 +34,15 @@ public class SpawnManager : MonoBehaviour
             int randomIndex = Random.Range(0, targets.Count);
 
             Instantiate(targets[randomIndex], transform);
+        }
+    }
+
+    private void StopSpawning()
+    {
+        if (spawnCoroutine != null)
+        {
+            StopCoroutine(spawnCoroutine);
+            spawnCoroutine = null;
         }
     }
 }
