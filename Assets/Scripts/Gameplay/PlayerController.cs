@@ -3,31 +3,52 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField] private ClickAndSwipe swipe;
+
+    private bool isSwiping;
+
+    private Camera cam;
     private InputSystem_Actions.PlayerActions playerActions;
 
     void Awake()
     {
         playerActions = InputManager.Instance.Controls.Player;
+        cam = Camera.main;
     }
 
     void OnEnable()
     {
-        playerActions.Attack.performed += Attack;
+        playerActions.Attack.started += BeginSwipe;
+        playerActions.Attack.canceled += EndSwipe;
     }
 
     void OnDisable()
     {
-        playerActions.Attack.performed -= Attack;
+        playerActions.Attack.started -= BeginSwipe;
+        playerActions.Attack.canceled -= EndSwipe;
     }
 
-    private void Attack(InputAction.CallbackContext ctx)
+    void Update()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        if (!isSwiping)
+            return;
 
-        if (Physics.Raycast(ray, out RaycastHit hit))
-        {
-            if (hit.collider.TryGetComponent(out Target target))
-                target.Hit();
-        }
+        Vector2 mousePos = Mouse.current.position.ReadValue();
+
+        Vector3 worldPos = cam.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 10f));
+
+        swipe.UpdateSwipe(worldPos);
+    }
+
+    private void BeginSwipe(InputAction.CallbackContext ctx)
+    {
+        isSwiping = true;
+        swipe.BeginSwipe();
+    }
+
+    private void EndSwipe(InputAction.CallbackContext ctx)
+    {
+        isSwiping = false;
+        swipe.EndSwipe();
     }
 }

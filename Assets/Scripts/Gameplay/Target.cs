@@ -47,7 +47,19 @@ public class Target : MonoBehaviour
         return new Vector3(Random.Range(-xRange, xRange), ySpawnPos);
     }
 
-    public void Hit()
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Swiper"))
+        {
+            Hit();
+            return;
+        }
+
+        if (other.CompareTag("DestroyZone"))
+            Destroy(gameObject);
+    }
+
+    private void Hit()
     {
         if (!isBomb)
             GameEvents.Raise(new GameEvent(GameEventType.Score, points));
@@ -60,11 +72,5 @@ public class Target : MonoBehaviour
         Instantiate(explosionParticle, transform.position, explosionParticle.transform.rotation);
 
         Destroy(gameObject);
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("DestroyZone"))
-            Destroy(gameObject);
     }
 }
