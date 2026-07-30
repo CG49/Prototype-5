@@ -57,6 +57,8 @@ public class GameManager : MonoBehaviour
         lives = 3;
         isGameOver = false;
 
+        InputManager.Instance.DisableGameplay();
+
         if (uiManager != null)
         {
             uiManager.UpdateScore(score);
@@ -70,6 +72,8 @@ public class GameManager : MonoBehaviour
 
         if(titleScreen != null)
             titleScreen.SetActive(false);
+
+        InputManager.Instance.EnableGameplay();
 
         if (spawnManager != null)
         {
