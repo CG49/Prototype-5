@@ -6,36 +6,41 @@ public class SpawnManager : MonoBehaviour
 {
     [SerializeField] private List<GameObject> targets;
 
+    private bool isSpawning;
     public float spawnRate = 1.0f;
 
     private Coroutine spawnCoroutine;
 
     void OnEnable()
     {
-        Target.OnGameOver += StopSpawning;
+        GameEvents.OnGameEvent += StopSpawning;
     }
 
     void OnDisable()
     {
-        Target.OnGameOver -= StopSpawning;
+        GameEvents.OnGameEvent -= StopSpawning;
     }
 
     public void StartSpawning()
     {
-        if (spawnCoroutine != null)
+        if (spawnCoroutine != null || isSpawning)
             return;
 
+        isSpawning = true;
         spawnCoroutine = StartCoroutine(SpawnTarget());
     }
 
     IEnumerator SpawnTarget()
     {
-        while (true)
+        while (isSpawning)
         {
             yield return new WaitForSeconds(spawnRate);
 
             if (targets.Count == 0)
             {
+                isSpawning = false;
+                spawnCoroutine = null;
+
                 Debug.LogError("No target prefabs assigned!");
                 yield break;
             }
@@ -46,12 +51,16 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
-    private void StopSpawning()
+    private void StopSpawning(GameEvent gameEvent)
     {
-        if (spawnCoroutine != null)
-        {
-            StopCoroutine(spawnCoroutine);
-            spawnCoroutine = null;
-        }
+        if (gameEvent.Type != GameEventType.GameOver)
+            return;
+
+        if (!isSpawning || spawnCoroutine == null)
+            return;
+
+        isSpawning = false;
+        StopCoroutine(spawnCoroutine);
+        spawnCoroutine = null;
     }
 }

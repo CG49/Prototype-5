@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     private int score;
+    private int lives;
     private bool isGameOver;
 
     private UIManager uiManager;
@@ -27,16 +28,14 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
 
-        Target.OnTargetHit += AddScore;
-        Target.OnGameOver += GameOver;
+        GameEvents.OnGameEvent += HandleGameEvent;
     }
 
     void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
 
-        Target.OnTargetHit -= AddScore;
-        Target.OnGameOver -= GameOver;
+        GameEvents.OnGameEvent -= HandleGameEvent;
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -55,11 +54,13 @@ public class GameManager : MonoBehaviour
     void InitializeGameState()
     {
         score = 0;
+        lives = 3;
         isGameOver = false;
 
         if (uiManager != null)
         {
             uiManager.UpdateScore(score);
+            uiManager.UpdateLives(lives);
         }
     }
 
@@ -68,9 +69,7 @@ public class GameManager : MonoBehaviour
         GameObject titleScreen = GameObject.FindGameObjectWithTag("TitleScreen");
 
         if(titleScreen != null)
-        {
             titleScreen.SetActive(false);
-        }
 
         if (spawnManager != null)
         {
@@ -79,13 +78,49 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void HandleGameEvent(GameEvent gameEvent)
+    {
+        switch (gameEvent.Type)
+        {
+            case GameEventType.Score:
+                AddScore(gameEvent.Value);
+                break;
+
+            case GameEventType.Lives:
+                AddLives(gameEvent.Value);
+                break;
+
+            case GameEventType.GameOver:
+                GameOver();
+                break;
+        }
+    }
+
     private void AddScore(int amount)
     {
         if (isGameOver)
             return;
 
-        score += amount;
-        uiManager.UpdateScore(score);
+        if (uiManager != null)
+        {
+            score += amount;
+            uiManager.UpdateScore(score);
+        }
+    }
+
+    private void AddLives(int value)
+    {
+        if (isGameOver)
+            return;
+
+        if (uiManager != null)
+        {
+            lives = Mathf.Max(0, lives + value);
+            uiManager.UpdateLives(lives);
+
+            if (lives <= 0)
+                GameEvents.Raise(new GameEvent(GameEventType.GameOver));
+        }
     }
 
     private void GameOver()
@@ -93,9 +128,7 @@ public class GameManager : MonoBehaviour
         isGameOver = true;
 
         if (uiManager != null)
-        {
             uiManager.ShowGameOver();
-        }
     }
 
     public void RestartGame()

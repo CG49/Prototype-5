@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
+    [SerializeField] private TextMeshProUGUI livesText;
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI gameOverText;
     [SerializeField] private Button restartButton;
@@ -11,6 +12,11 @@ public class UIManager : MonoBehaviour
     public void UpdateScore(int score)
     {
         scoreText.text = "Score : " + score;
+    }
+
+    public void UpdateLives(int value)
+    {
+        livesText.text = "Lives : " + value;
     }
 
     public void ShowGameOver() {

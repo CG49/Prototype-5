@@ -155,4 +155,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Target
   points: 3
   isBomb: 0
+  popSound: {fileID: 8300000, guid: 08ab7053d586c458db3774d33c141a4b, type: 3}
   explosionParticle: {fileID: 7303472089845130122, guid: 6cbc21f5e9162483993a2b84b14d5ac8, type: 3}

@@ -7,6 +7,7 @@ public class Target : MonoBehaviour
 {
     [SerializeField] private int points;
     [SerializeField] private bool isBomb;
+    [SerializeField] private AudioClip popSound;
     [SerializeField] ParticleSystem explosionParticle;
 
     private const float minSpeed = 13;
@@ -16,9 +17,6 @@ public class Target : MonoBehaviour
     private const float ySpawnPos = -5;
 
     private Rigidbody targetRb;
-
-    public static event Action<int> OnTargetHit;
-    public static event Action OnGameOver;
 
     void Awake()
     {
@@ -52,9 +50,12 @@ public class Target : MonoBehaviour
     public void Hit()
     {
         if (!isBomb)
-            OnTargetHit?.Invoke(points);
+            GameEvents.Raise(new GameEvent(GameEventType.Score, points));
         else
-            OnGameOver?.Invoke();
+            GameEvents.Raise(new GameEvent(GameEventType.Lives, -1));
+
+        if (popSound != null)
+            AudioManager.Instance.PlaySFX(popSound);
 
         Instantiate(explosionParticle, transform.position, explosionParticle.transform.rotation);
 
