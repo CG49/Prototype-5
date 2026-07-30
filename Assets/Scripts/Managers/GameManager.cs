@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,6 +7,7 @@ public class GameManager : MonoBehaviour
 
     private int score;
     private int lives;
+    private bool isPaused;
     private bool isGameOver;
 
     private UIManager uiManager;
@@ -93,6 +93,10 @@ public class GameManager : MonoBehaviour
             case GameEventType.GameOver:
                 GameOver();
                 break;
+
+            case GameEventType.Pause:
+                TogglePause();
+                break;
         }
     }
 
@@ -129,6 +133,21 @@ public class GameManager : MonoBehaviour
 
         if (uiManager != null)
             uiManager.ShowGameOver();
+    }
+
+    private void TogglePause()
+    {
+        isPaused = !isPaused;
+
+        if (isPaused)
+            InputManager.Instance.DisableGameplay();
+        else
+            InputManager.Instance.EnableGameplay();
+
+        if (uiManager != null)
+            uiManager.ShowPauseScreen(isPaused);
+
+        Time.timeScale = isPaused ? 0f : 1f;
     }
 
     public void RestartGame()

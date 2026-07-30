@@ -2,5 +2,6 @@
 {
     Score,
     Lives,
-    GameOver
+    GameOver,
+    Pause
 }

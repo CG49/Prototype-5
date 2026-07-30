@@ -8,6 +8,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI gameOverText;
     [SerializeField] private Button restartButton;
+    [SerializeField] private GameObject pausePanel;
 
     public void UpdateScore(int score)
     {
@@ -27,5 +28,10 @@ public class UIManager : MonoBehaviour
     private void ShowRestartButton()
     {
         restartButton.gameObject.SetActive(true);
+    }
+
+    public void ShowPauseScreen(bool show)
+    {
+        pausePanel.SetActive(show);
     }
 }
